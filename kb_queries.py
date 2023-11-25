@@ -3,7 +3,7 @@ from neo4j import Driver, GraphDatabase
 from pydantic import BaseModel, EmailStr
 from pymongo import MongoClient
 import os
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 
 load_dotenv()
 

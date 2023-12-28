@@ -17,8 +17,8 @@ async def get_client_details(request:Request,userID:str):
     return res
 
 @app.post("/client", response_class=JSONResponse, tags=["client"])  
-async def create_client(request:Request,client_properties:dict = Body(...)):
-    res = createClient(client_properties)
+async def create_client(request:Request,userID:str,client_properties:dict = Body(...)):
+    res = createClient(userID,client_properties)
     return res
     
 
@@ -50,12 +50,14 @@ async def create_property(request:Request,userID:str,corp_Id:str,corporation_pro
     return res
 
 @app.patch("/property", response_class=JSONResponse, tags=["property"])
-async def update_property():
-    pass
+async def update_property(request:Request,corp_Id:str,corporation_properties:dict=Body(...)):
+    res  = updatePropertyDetails(corp_Id,corporation_properties)
+    return res
 
 @app.delete("/property", response_class=JSONResponse, tags=["property"])
-async def remove_property():
-    pass
+async def remove_property(request:Request,corp_Id:str,corporation_properties:dict=Body(...)):
+    res  = removePropertyDetails(corp_Id,corporation_properties)
+    return res
 
 
 @app.get("/vendor", response_class=JSONResponse, tags=["vendor"])
@@ -70,7 +72,7 @@ async def get_vendor(request:Request,property_uuid:str,id:str):
 
 @app.post("/vendor", response_class=JSONResponse, tags=["vendor"])
 async def create_vendor():
-    pass
+    result = createVendor()
 
 @app.patch("/vendor", response_class=JSONResponse, tags=["vendor"])
 async def update_vendor():
@@ -79,6 +81,17 @@ async def update_vendor():
 @app.delete("/vendor", response_class=JSONResponse, tags=["vendor"])
 async def remove_vendor():
     pass
+
+
+
+
+
+
+
+
+
+
+
 
 
 @app.get("/vendor_of", response_class=JSONResponse, tags=["vendor_of"])
@@ -94,12 +107,15 @@ async def create_vendor_of():
     pass
 
 @app.patch("/vendor_of", response_class=JSONResponse, tags=["vendor_of"])
-async def update_vendor_of():
-    pass
+async def update_vendor_of(request:Request,client_uuid:str,corporationID:str,id:str,relationship_properties:dict=Body(...)):
+    res = update_relPropsOf_Vendor_of(client_uuid,corporationID,id,relationship_properties)
+    return res
+    
 
 @app.delete("/vendor_of", response_class=JSONResponse, tags=["vendor_of"])
-async def remove_vendor_of():
-    pass
+async def remove_vendor_of(request:Request,client_uuid:str,corporationID:str,id:str,relationship_properties:dict=Body(...)):
+    res = update_relPropsOf_Vendor_of(client_uuid,corporationID,id,relationship_properties)
+    return res
 
 @app.get("/property_of", response_class=JSONResponse, tags=["property_of"])
 async def get_all_property_ofs():
@@ -110,14 +126,18 @@ async def get_property_of():
     pass
 
 @app.post("/property_of", response_class=JSONResponse, tags=["property_of"])
-async def create_property_of():
+async def create_property_of(request:Request,client_uuid:str,corporationID:str,relationship_properties:dict=Body(...)):
     pass
+    
 
 @app.patch("/property_of", response_class=JSONResponse, tags=["property_of"])
-async def update_property_of():
-    pass
+async def update_property_of(request:Request,client_uuid:str,corporationID:str,relationship_properties:dict=Body(...)):
+    res = update_relPropsOf_Property_of(client_uuid,corporationID,relationship_properties)
+    return res
+    
 
 @app.delete("/property_of", response_class=JSONResponse, tags=["property_of"])
-async def remove_property_of():
-    pass
+async def remove_property_of(request:Request,client_uuid:str,corporationID:str,relationship_properties:dict=Body(...)):
+    res = remove_relPropsOf_Property_of(client_uuid,corporationID,relationship_properties)
+    return res
 

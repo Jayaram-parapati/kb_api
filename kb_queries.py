@@ -1,9 +1,8 @@
 import json,re
 from neo4j import Driver, GraphDatabase
 from pydantic import BaseModel, EmailStr
-from pymongo import MongoClient
 import os
-# from dotenv import load_dotenv
+from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -12,8 +11,7 @@ AUTH = (os.getenv("NEO4J_USER"), os.getenv("NEO4J_PASSWORD"))
 print(URI,AUTH)
 driver = GraphDatabase.driver(uri=URI, auth=AUTH)
 
-mongo = MongoClient(os.getenv("MONGODB_URI"))
-mydb = mongo[os.getenv("MONGODB_DB")]
+
 
 
 def getAllClients(request):
@@ -33,11 +31,11 @@ def getClient(userID):
         # print(res)
         return res
     
-def createClient(c_properties):
+def createClient(userID,c_properties):
     with driver.session() as session:
         # c_properties = json.loads(c_properties)
         print(c_properties)
-        query = f"MERGE (c:Client_new) ON CREATE \n SET "
+        query = f"MERGE (c:Client{{userID:{userID}}}) ON CREATE \n SET "
         for key,value in c_properties.items():
             query += "c."+key+"=\""+value+"\","
         query = query[:-1]
@@ -173,7 +171,7 @@ def getVendor(property_uuid,id):
         return res
         
         
-def createNode(property_uuid,id):
+def createVendor(property_uuid,id):
     with driver.session() as session:
         query = f"MERGE (v:Vendor)-[r:VENDOR_OF{{property_uuid:{property_uuid},id:{id}}}]-(p:Property) SET"
          
@@ -185,8 +183,63 @@ def createNode(property_uuid,id):
 
 
         
-
-
+def update_relPropsOf_Property_of(client_uuid,corporationID,relationship_properties):
+    with driver.session() as session:
+        print(client_uuid,corporationID,relationship_properties)
+        query = f"MATCH(c:Client)-[r:PROPERTY_OF{{client_uuid:{client_uuid},corporationID:{corporationID}}}]-(p:Property) \n SET "
+        for key,value in relationship_properties.items():
+            query += "r."+key+"=\""+value+"\","
+        query = query[:-1]
+        query += f" RETURN apoc.convert.toJson(r) as rel_props"
+        
+        print(query)
+        
+        result = session.run(query)
+        res = [json.loads(x.get("rel_props")) for x in result]
+        return res
+    
+def remove_relPropsOf_Property_of(client_uuid,corporationID,relationship_properties):
+    with driver.session() as session:
+        query = f"MATCH(c:Client)-[r:PROPERTY_OF{{client_uuid:{client_uuid},corporationID:{corporationID}}}]-(p:Property) \n SET "
+        for key,value in relationship_properties.items():
+            query += "r."+key+"=\"""\","
+        query = query[:-1]
+        query += f" RETURN apoc.convert.toJson(r) as rel_props"
+        
+        print(query)
+        
+        result = session.run(query)
+        res = [json.loads(x.get("rel_props")) for x in result]
+        return res    
+            
+def update_relPropsOf_Vendor_of(client_uuid,corporationID,id,relationship_properties):
+    with driver.session() as session:
+        print(client_uuid,corporationID,relationship_properties)
+        query = f"MATCH(v:Vendor)-[r:VENDOR_OF{{client_uuid:{client_uuid},corporationID:{corporationID},id:{id}}}]-(p:Property) \n SET "
+        for key,value in relationship_properties.items():
+            query += "r."+key+"=\""+value+"\","
+        query = query[:-1]
+        query += f" RETURN apoc.convert.toJson(r) as rel_props"
+        
+        print(query)
+        
+        result = session.run(query)
+        res = [json.loads(x.get("rel_props")) for x in result]
+        return res
+    
+def remove_relPropsOf_Vendor_of(client_uuid,corporationID,id,relationship_properties):
+    with driver.session() as session:
+        query = f"MATCH(v:Vendor)-[r:VENDOR_OF{{client_uuid:{client_uuid},corporationID:{corporationID}.id:{id}}}]-(p:Property) \n SET "
+        for key,value in relationship_properties.items():
+            query += "r."+key+"=\"""\","
+        query = query[:-1]
+        query += f" RETURN apoc.convert.toJson(r) as rel_props"
+        
+        print(query)
+        
+        result = session.run(query)
+        res = [json.loads(x.get("rel_props")) for x in result]
+        return res 
 
 
 

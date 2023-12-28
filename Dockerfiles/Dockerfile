@@ -2,6 +2,6 @@ FROM python
 
 WORKDIR /KB_API
 
-COPY test.py .
+COPY . .
 
 CMD ["python","test.py"]

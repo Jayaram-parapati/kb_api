@@ -1,7 +1,7 @@
 name: build and push docker image to docker hub
 
-on: push
- 
+on:
+  push
 
 jobs:
   push_to_registry:
@@ -23,3 +23,4 @@ jobs:
           context: Dockerfiles/
           push: true
           tags: jayaramparapati2023/newrepo:latest
+

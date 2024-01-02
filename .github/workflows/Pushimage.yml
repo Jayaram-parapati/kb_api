@@ -20,7 +20,7 @@ jobs:
       - name: build and push docker image
         uses: docker/build-push-action@v4
         with:
-          context: Dockerfiles/
+          context: .
           push: true
           tags: jayaramparapati2023/newrepo:latest
 
